@@ -1,0 +1,15 @@
+一、spring 中的主要接口
+1.BeanFactory  2. ApplicationContext
+BeanFactory 接口是ApplicationContext 接口的 父接口 。ApplicationContext 组合了 BeanFactory 的功能， 事实上 BeanFactory 是 ApplicationContext 的一个 成员变量
+BeanFactory 能做点什么
+表面上看 只有getBean  实际上控制反转 基本的依赖注入 甚至Bean的生命周期的各种功能，都由它的实现类提供（defaultListableBeanFactory）
+ApplicationContext 比 BeanFactory 多点啥
+1.MessageSource接口 处理国际化资源的能力 不同语言资源翻译
+2.ResourcePatternResolver接口 处理通配符匹配资源的能力 通过磁盘路径 或者某些路径 去寻找资源
+3.ApplicationEventPublisher接口 处理 发布事件对象 也算是一种代码解耦的方式
+4.EnvironmentCapable接口 处理 系统环境变量或者配置文件里的一些环境信息
+二、spring容器中的主要实现
+1.BeanFactory实现 的特点 2 ApplicationContext的常见实现和用法 3内嵌容器 注册DispatcherServlet
+
+BeanFactory 一开始没有bean，需要bean定义后注册到BeanFactory , 一些@Bean注解也没有注入到BeanFactory，因为解析@Bean注解不是BeanFactory的工作，需要给BeanFactory添加一些后置处理器，
+这时候除了bean定义的bean，还会有一些后置处理器，但是还是没有有注解的bean,因为后置处理器还没有工作，没有解析注解，当后置处理器执行后才会解析@Bean注解
