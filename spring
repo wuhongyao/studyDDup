@@ -11,5 +11,42 @@ ApplicationContext 比 BeanFactory 多点啥
 二、spring容器中的主要实现
 1.BeanFactory实现 的特点 2 ApplicationContext的常见实现和用法 3内嵌容器 注册DispatcherServlet
 
-BeanFactory 一开始没有bean，需要bean定义后注册到BeanFactory , 一些@Bean注解也没有注入到BeanFactory，因为解析@Bean注解不是BeanFactory的工作，需要给BeanFactory添加一些后置处理器，
-这时候除了bean定义的bean，还会有一些后置处理器，但是还是没有有注解的bean,因为后置处理器还没有工作，没有解析注解，当后置处理器执行后才会解析@Bean注解
+BeanFactory 一开始没有bean，需要bean定义后注册到BeanFactory , 一些@Bean注解也没有注入到BeanFactory，因为解析@Bean注解不是BeanFactory的工作，需要给BeanFactory添加一些后处理器，
+这时候除了bean定义的bean，还会有一些后处理器，但是还是没有有注解的bean,因为后处理器还没有工作，没有解析注解，当后处理器执行后才会解析@Bean注解。此时@Autoware也还没有工作，
+没有注入对象，因为Bean的一些后处理器还没有工作，这些后处理器 是针对 bean的生命周期的各个阶段提供扩展，例如@Autoware @Resource等等
+默认状态下，延迟创建对象，当用到getBean的时候才会创建，beanFactory.preInstantiateSingletons(); 会提前准备后所有单例对象，会提前创建
+总结：1.beanFactory 不会主动调用beanFactory后处理器，不会主动添加bean后处理器 不会主动初始化单例对象，也不会主动解析 ${}与#{}
+     2.bean后处理器会有排顺序逻辑，加入后处理器的先后顺序会导致不同注解先后解析顺序 比如@autoware和@resource，通过比较器可以修改后处理器的先后顺序，这个比较器是beanFactory里添加的，
+     是一个饿汉式的单例对象，后处理器的 getOrder（）方法返回的数字作为排序依据
+     
+ApplicationContext的实现 由4个实现  1.较为经典的容器，基于classpath下xml格式的配置文件来创建 ClassPathXmlApplicationContext 相对路径
+                                   2.基于磁盘路径下 xml格式的配置文件来创建 FileSystemXmlApplicationContext  绝对(实际)路径
+                                   3.较为经典的容器，基于java配置类来创建AnnotationConfigApplicationContext
+                                   4.较为经典的容器，基于java配置类来创建,用于web环境 AnnotationConfigServletWebServerApplicationContext
+
+三、bean的生命周期  以及设计模式
+    构造（创建）（实例化）--> 依赖注入--> 初始化--> 销毁  bean的后处理器会对这些阶段进行增强。
+    设计模式：模板方法 静态的部分不变，动态的部分抽调成接口，通过回调来增加动态部分
+    
+四、bean后处理器的作用，以及常见的后处理器
+    用一个干净的容器 GenericApplicationContext 其中的refresh()方法 会执行beanFactory后处理器，添加bean后处理器，初始化所有单例
+    bean后处理器 AutowariedAnnotationBeanPostProcessor 解析@Autowired @Value  commonAnnotationBeanPostProcessor  解析 @Resource @PostConstruct @PreDestory
+    springboot中 bean后处理器 ConfigurationPropertiesBindingPostPrecessor 解析 @ConfigurationProperties
+
+五、beanFactory后处理器
+    1.beanFactory后处理器作用主要为beanFactory提供扩展 2.常见的beanFactory后处理器
+    beanFactory后处理器 1.ConfigurationClassPostProcessor 解析@ComponentScan @bean @Import @ImportResource
+                       2.MapperScannerConfigurer 解析 @MapperScanner
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
